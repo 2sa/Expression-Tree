@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace ConsoleApplication5
@@ -50,13 +50,13 @@ namespace ConsoleApplication5
             Console.ReadLine();
         }
 
-        private static TreeNode TreeBuild(string rpn)
+        private static TreeNode TreeBuild(string expression)
         {
             var stack = new Stack<TreeNode>();
 
-            foreach (var ch in rpn)
+            foreach (var ch in expression)
             {
-                if (IsOp(ch))
+                if (IsOperation(ch))
                 {
                     var opRight = stack.Pop();
                     var opLeft = stack.Pop();
@@ -147,26 +147,22 @@ namespace ConsoleApplication5
                         stack.Pop();
                     }
                 }
-                else if (IsOp(ch))
+                else if (IsOperation(ch))
                 {
-                    if (stack.Count != 0)
+                    while (stack.Count > 0)
                     {
-                        while (stack.Count > 0)
+                        if (GetOperationPriority(stack.Peek()) >= GetOperationPriority(ch) || stack.Peek() != '(')
                         {
-                            if (IsOpHigh(stack.Peek()) >= IsOpHigh(ch) || stack.Peek() != '(')
-                            {
-                                Console.Write(stack.Pop());
-                            }
-                            else
-                            {
-                                break;
-                            }
+                            Console.Write(stack.Pop());
+                        }
+                        else
+                        {
+                            break;
                         }
                     }
-
+                    
                     stack.Push(ch);
                 }
-
                 else
                 {
                     Console.Write(ch);
@@ -181,17 +177,17 @@ namespace ConsoleApplication5
             Console.WriteLine("");
         }
 
-        private static int IsOpHigh(char op)
+        private static int GetOperationPriority(char operation)
         {
-            return op == '(' ? 0
-                : (op == ')' ? 1 
-                : (op == '+' || op == '-' ? 2 
-                : (op == '*' || op == '/' ? 3 
-                : (op == '^' ? 4 
+            return operation == '(' ? 0
+                : (operation == ')' ? 1 
+                : (operation == '+' || operation == '-' ? 2 
+                : (operation == '*' || operation == '/' ? 3 
+                : (operation == '^' ? 4 
                 : -1))));
         }
 
-        private static bool IsOp(char c)
+        private static bool IsOperation(char c)
         {
             return c == '*' || c == '/' || c == '+' || c == '-' || c == '^';
         }
